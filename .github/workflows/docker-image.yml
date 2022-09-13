@@ -1,0 +1,111 @@
+env:
+  LOCAL_REGISTRY: registry.wimill.xyz
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+name: Build and push docker image
+on:
+  push:
+    branches: [main]
+    tags: ["*"]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: [self-hosted, new]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Docker meta local
+        id: metalocal
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.LOCAL_REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Build and push privately
+        uses: docker/build-push-action@v3
+        if: github.event_name == 'pull_request'
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ steps.metalocal.outputs.tags }}
+
+          labels: ${{ steps.metalocal.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.LOCAL_REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.LOCAL_REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+
+      - name: Docker meta
+        if: github.event_name != 'pull_request'
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Login to registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push publicly
+        uses: docker/build-push-action@v3
+        if: github.event_name != 'pull_request'
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ steps.metalocal.outputs.tags }}
+            ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.metalocal.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+  playwright:
+    runs-on: [self-hosted, new]
+    needs: [build]
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_DB: windmill
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: changeme
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v3
+      - name: "Docker"
+        run: echo "::set-output name=id::$(docker run --network=host --rm -d -p 8000:8000 --privileged -it -e DATABASE_URL=postgres://admin:changeme@localhost:5432/windmill -e BASE_INTERNAL_URL=http://localhost:8000 ${{ env.LOCAL_REGISTRY }}/${{ env.IMAGE_NAME }}:latest)"
+        id: docker-container
+      - name: "Playwright run"
+        timeout-minutes: 2
+        run: cd frontend && npm ci @playwright/test && npx playwright install && npm run test
+      - name: "Clean up"
+        run: docker kill ${{ steps.docker-container.outputs.id }}
+        if: always()

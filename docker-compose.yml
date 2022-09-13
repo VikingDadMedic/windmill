@@ -1,0 +1,56 @@
+version: "3.7"
+
+services:
+  db:
+    image: postgres:14
+    restart: unless-stopped
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: windmill
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  windmill:
+    image: ghcr.io/windmill-labs/windmill:main
+    privileged: true
+    restart: unless-stopped
+    ports:
+      - 8000:8000
+    environment:
+      - DATABASE_URL=postgres://postgres:${DB_PASSWORD}@db/windmill?sslmode=disable
+      - BASE_URL=http://${WM_BASE_URL}
+      - BASE_INTERNAL_URL=http://localhost:8000
+      - RUST_LOG=info
+      - NUM_WORKERS=3
+      - RUST_BACKTRACE=1
+      - DISABLE_NUSER=false
+      - DENO_PATH=/usr/bin/deno
+      - PYTHON_PATH=/usr/local/bin/python3
+      - NSJAIL_PATH=nsjail
+    depends_on:
+      db:
+        condition: service_healthy
+  lsp:
+    image: ghcr.io/windmill-labs/windmill-lsp:latest
+    restart: unless-stopped
+    ports:
+      - 3001:3001
+  caddy:
+    image: caddy:2.5.2-alpine
+    restart: unless-stopped
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      - BASE_URL=${WM_BASE_URL}
+
+volumes:
+  db_data: null
