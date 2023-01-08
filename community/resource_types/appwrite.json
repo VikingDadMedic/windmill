@@ -1,0 +1,36 @@
+{
+  "workspace_id": "starter",
+  "name": "appwrite",
+  "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+      "endpoint": {
+        "type": "string",
+        "description": "url of your appwrite server",
+        "default": "https://"
+      },
+      "project": {
+        "type": "string",
+        "description": "ID of your appwrite project",
+        "default": ""
+      },
+      "key": {
+        "type": "string",
+        "description": "API key of your appwrite project",
+        "default": ""
+      },
+      "self_signed": {
+        "type": "boolean",
+        "description": "use self signed certificates on server (only for development)",
+        "default": ""
+      }
+    },
+    "required": [
+      "endpoint",
+      "project",
+      "key"
+    ],
+    "type": "object"
+  },
+  "description": "credentials to connect to an [appwrite](https://appwrite.io/docs) project"
+}

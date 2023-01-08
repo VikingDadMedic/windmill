@@ -1,17 +1,12 @@
 {
   "workspace_id": "starter",
-  "name": "gitlab",
+  "name": "linkedin",
   "schema": {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
-      "baseUrl": {
-        "type": "string",
-        "description": "",
-        "default": "https://gitlab.com"
-      },
       "token": {
         "type": "string",
-        "description": "",
+        "description": "OAuth token",
         "default": ""
       }
     },
@@ -20,5 +15,5 @@
     ],
     "type": "object"
   },
-  "description": ""
+  "description": "The OAuth token for LinkedIn"
 }

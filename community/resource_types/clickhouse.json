@@ -1,22 +1,27 @@
 {
   "workspace_id": "starter",
-  "name": "gitlab",
+  "name": "clickhouse",
   "schema": {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
-      "baseUrl": {
+      "host": {
         "type": "string",
         "description": "",
-        "default": "https://gitlab.com"
+        "default": ""
       },
-      "token": {
+      "username": {
+        "type": "string",
+        "description": "",
+        "default": ""
+      },
+      "password": {
         "type": "string",
         "description": "",
         "default": ""
       }
     },
     "required": [
-      "token"
+      "host"
     ],
     "type": "object"
   },
