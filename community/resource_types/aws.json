@@ -1,24 +1,30 @@
 {
   "workspace_id": "starter",
-  "name": "gitlab",
+  "name": "aws",
   "schema": {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
-      "baseUrl": {
+      "awsAccessKeyId": {
         "type": "string",
         "description": "",
-        "default": "https://gitlab.com"
+        "default": ""
       },
-      "token": {
+      "awsSecretAccessKey": {
+        "type": "string",
+        "description": "",
+        "default": ""
+      },
+      "region": {
         "type": "string",
         "description": "",
         "default": ""
       }
     },
     "required": [
-      "token"
+      "awsAccessKeyId",
+      "awsSecretAccessKey"
     ],
     "type": "object"
   },
-  "description": ""
+  "description": "AWS credentials"
 }

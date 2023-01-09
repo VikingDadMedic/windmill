@@ -2,35 +2,40 @@
   "workspace_id": "starter",
   "name": "mysql",
   "schema": {
-    "type": "object",
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "required": [
-      "password",
-      "user"
-    ],
     "properties": {
       "host": {
         "type": "string",
-        "description": "The instance host"
+        "description": "instance host",
+        "default": ""
       },
       "port": {
-        "type": "integer",
-        "default": 3306,
-        "description": "The instance port"
+        "type": "number",
+        "description": "instance port",
+        "default": 3306
       },
       "user": {
         "type": "string",
-        "description": "The postgres username"
+        "description": "username",
+        "default": ""
       },
       "database": {
         "type": "string",
-        "description": "The database to connect to"
+        "description": "database name",
+        "default": ""
       },
       "password": {
         "type": "string",
-        "description": "The postgres users password"
+        "description": "user's password",
+        "default": ""
       }
-    }
+    },
+    "required": [
+      "user",
+      "database",
+      "password"
+    ],
+    "type": "object"
   },
-  "description": "MySql connection info"
+  "description": "MySQL connection info"
 }

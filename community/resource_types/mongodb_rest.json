@@ -1,24 +1,25 @@
 {
   "workspace_id": "starter",
-  "name": "gitlab",
+  "name": "mongodb_rest",
   "schema": {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
-      "baseUrl": {
+      "endpoint": {
         "type": "string",
-        "description": "",
-        "default": "https://gitlab.com"
+        "description": "For example: https://data.mongodb-api.com/app/<APP_ID>/endpoint/data/v1",
+        "default": ""
       },
-      "token": {
+      "api_key": {
         "type": "string",
         "description": "",
         "default": ""
       }
     },
     "required": [
-      "token"
+      "endpoint",
+      "api_key"
     ],
     "type": "object"
   },
-  "description": ""
+  "description": "Resource type to access MongoDB through the Atlas Data API"
 }

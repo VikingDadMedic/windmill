@@ -1,23 +1,21 @@
 {
   "workspace_id": "starter",
-  "name": "gitlab",
+  "name": "mailchimp",
   "schema": {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
-      "baseUrl": {
-        "type": "string",
-        "description": "",
-        "default": "https://gitlab.com"
-      },
-      "token": {
+      "api_key": {
         "type": "string",
         "description": "",
         "default": ""
+      },
+      "server": {
+        "type": "string",
+        "description": "The data center for your Mailchimp account. (For example: us12)",
+        "default": ""
       }
     },
-    "required": [
-      "token"
-    ],
+    "required": [],
     "type": "object"
   },
   "description": ""

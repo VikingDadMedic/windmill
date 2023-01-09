@@ -1,22 +1,23 @@
 {
   "workspace_id": "starter",
-  "name": "gitlab",
+  "name": "faunadb",
   "schema": {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "properties": {
-      "baseUrl": {
+      "region": {
         "type": "string",
-        "description": "",
-        "default": "https://gitlab.com"
+        "description": "Region of your database. Current possible values: us, eu, classic.\nLearn more at https://docs.fauna.com/fauna/current/learn/understanding/region_groups",
+        "default": ""
       },
-      "token": {
+      "secret": {
         "type": "string",
         "description": "",
         "default": ""
       }
     },
     "required": [
-      "token"
+      "region",
+      "secret"
     ],
     "type": "object"
   },
